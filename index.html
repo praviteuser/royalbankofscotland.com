@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Royal Bank of Scotland - Secure Banking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            background-color: #f2f4f7;
+            color: #333;
+            overflow: hidden;
+        }
+
+        /* Responsive Full-Screen Layout */
+        .app-container {
+            width: 100%;
+            height: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            background: #ffffff;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.08);
+        }
+
+        @media (min-width: 481px) {
+            .app-container {
+                height: 100vh;
+                border-left: 1px solid #e0e0e0;
+                border-right: 1px solid #e0e0e0;
+            }
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+            z-index: 10;
+        }
+
+        .screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.03);
+            z-index: 1;
+        }
+
+        /* 1. SPLASH SCREEN */
+        #splash-screen {
+            background: #6c0e3e; /* RBS Deep Burgundy */
+            color: #ffffff;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 24px;
+        }
+
+        .rbs-logo-mark {
+            width: 84px;
+            height: 84px;
+            background: #ffffff;
+            color: #6c0e3e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 38px;
+            font-weight: 700;
+            border-radius: 14px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            letter-spacing: -2px;
+        }
+
+        .splash-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .splash-subtitle {
+            font-size: 13px;
+            color: #e0b0c0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .loader-dots {
+            margin-top: 40px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 9px;
+            height: 9px;
+            background: #ffffff;
+            border-radius: 50%;
+            animation: pulse 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes pulse {
+            0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+            40% { transform: scale(1.0); opacity: 1; }
+        }
+
+        /* 2. LOGIN SCREEN */
+        #login-screen {
+            background: #f8f9fb;
+            padding: 40px 24px;
+            justify-content: space-between;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .login-logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #6c0e3e;
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+        }
+
+        .login-sub {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .login-form {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+            background: #fafafa;
+        }
+
+        .input-group input:focus {
+            border-color: #6c0e3e;
+            background: #fff;
+        }
+
+        .login-error {
+            color: #d32f2f;
+            font-size: 12px;
+            margin-bottom: 12px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #6c0e3e;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 5px;
+            transition: background 0.2s;
+        }
+
+        .login-btn:hover {
+            background: #540930;
+        }
+
+        .login-footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        /* 3. DASHBOARD SCREEN */
+        #dashboard-screen {
+            background: #f4f5f7;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .app-bar {
+            background: #6c0e3e;
+            color: #ffffff;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .app-bar h1 {
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .app-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-info-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-name-display {
+            font-size: 12px;
+            font-weight: 600;
+            color: #ffcccc;
+        }
+
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .logout-btn-top {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .logout-btn-top:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .dashboard-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* HOLD ALERT BANNER */
+        .hold-banner {
+            background: #fdf2f2;
+            border: 1px solid #f8b4b4;
+            border-left: 5px solid #d32f2f;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            box-shadow: 0 2px 6px rgba(211,47,47,0.05);
+        }
+
+        .hold-icon {
+            font-size: 20px;
+            color: #d32f2f;
+            line-height: 1;
+        }
+
+        .hold-text h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #c62828;
+            margin-bottom: 3px;
+        }
+
+        .hold-text p {
+            font-size: 12px;
+            color: #662222;
+            line-height: 1.4;
+        }
+
+        /* ACCOUNT CARD */
+        .account-card {
+            background: linear-gradient(135deg, #6c0e3e 0%, #4a0629 100%);
+            color: #ffffff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 16px rgba(108, 14, 62, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .account-card::after {
+            content: '';
+            position: absolute;
+            right: -20px;
+            bottom: -20px;
+            width: 120px;
+            height: 120px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+
+        .acc-holder-name {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #ffcccc;
+            margin-bottom: 2px;
+            font-weight: 700;
+        }
+
+        .acc-type {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .acc-number {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 16px;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+
+        .acc-balance-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+        }
+
+        .acc-balance {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 4px 0 12px 0;
+            letter-spacing: -0.5px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(211, 47, 47, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #ffcccc;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: #ff5252;
+            border-radius: 50%;
+            animation: blink 1s infinite alternate;
+        }
+
+        @keyframes blink {
+            from { opacity: 0.4; }
+            to { opacity: 1; }
+        }
+
+        /* TRANSACTIONS SECTION */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .section-header h2 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .section-header span {
+            font-size: 12px;
+            color: #6c0e3e;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .transaction-list {
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .tx-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .tx-item:last-child {
+            border-bottom: none;
+        }
+
+        .tx-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .tx-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .tx-icon.in {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .tx-icon.out {
+            background: #fbe9e7;
+            color: #d84315;
+        }
+
+        .tx-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 2px;
+        }
+
+        .tx-date {
+            font-size: 11px;
+            color: #888;
+        }
+
+        .tx-right {
+            text-align: right;
+        }
+
+        .tx-amount {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .tx-amount.positive {
+            color: #2e7d32;
+        }
+
+        .tx-amount.negative {
+            color: #d84315;
+        }
+
+        .tx-status {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        /* BOTTOM NAV */
+        .bottom-nav {
+            background: #ffffff;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            flex-shrink: 0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #888;
+            font-size: 10px;
+            gap: 4px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            outline: none;
+            flex: 1;
+        }
+
+        .nav-item.active {
+            color: #6c0e3e;
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+        }
+
+        /* MODAL POPUPS */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            width: 85%;
+            max-width: 340px;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+
+        .modal-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .modal-desc {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .copy-box {
+            background: #f4f5f7;
+            border: 1px dashed #ccc;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #6c0e3e;
+            margin-bottom: 20px;
+            word-break: break-all;
+            cursor: pointer;
+        }
+
+        .copy-box:hover {
+            background: #eaecee;
+        }
+
+        .modal-btn {
+            background: #6c0e3e;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .modal-btn:hover {
+            background: #540930;
+        }
+
+        .toast {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- 1. SPLASH SCREEN -->
+        <div id="splash-screen" class="screen">
+            <div class="rbs-logo-mark">RBS</div>
+            <div class="splash-title">Royal Bank of Scotland</div>
+            <div class="splash-subtitle">Secure Banking</div>
+            <div class="loader-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+
+        <!-- 2. LOGIN SCREEN -->
+        <div id="login-screen" class="screen hidden">
+            <div class="login-header">
+                <div class="login-logo">RBS</div>
+                <div class="login-sub">Log in to Mobile Banking</div>
+            </div>
+
+            <div class="login-form">
+                <div class="input-group">
+                    <label>Account Holder Name</label>
+                    <input type="text" id="login-name" placeholder="Enter name ()">
+                </div>
+                <div class="input-group">
+                    <label>Customer Number</label>
+                    <input type="text" id="login-number" placeholder="Enter number ()">
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" placeholder="Enter password ()">
+                </div>
+                <div id="login-error" class="login-error">password incorrect</div>
+                <button class="login-btn" onclick="attemptLogin()">Secure Login</button>
+            </div>
+
+            <div class="login-footer">
+                Need help logging in? Contact Support
+            </div>
+        </div>
+
+        <!-- 3. DASHBOARD SCREEN -->
+        <div id="dashboard-screen" class="screen hidden">
+            <div class="app-bar">
+                <h1>Accounts</h1>
+                <div class="app-bar-right">
+                    <div class="user-info-area">
+                        <span class="user-name-display" id="display-name">Tina Bradley</span>
+                        <div class="user-avatar" id="display-avatar">TB</div>
+                    </div>
+                    <button class="logout-btn-top" onclick="logout()">Log Out</button>
+                </div>
+            </div>
+
+            <div class="dashboard-content">
+                <!-- HOLD WARNING BANNER -->
+                <div class="hold-banner">
+                    <div class="hold-icon">⚠️</div>
+                    <div class="hold-text">
+                        <h3>Account Temporarily On Hold</h3>
+                        <p>Outgoing transactions are restricted. Please contact customer support or complete verification to lift the hold.</p>
+                    </div>
+                </div>
+
+                <!-- ACCOUNT SUMMARY CARD -->
+                <div class="account-card">
+                    <div class="acc-holder-name" id="card-holder-name">Tina Bradley</div>
+                    <div class="acc-type">Select Premier Account</div>
+                    <div class="acc-number">Sort Code: 83-16-52 • Acc: 49281055</div>
+                    <div class="acc-balance-label">Available Balance</div>
+                    <div class="acc-balance">£3,000,000.00</div>
+                    <div class="status-pill">
+                        <span class="status-dot"></span>
+                        Status: On Hold
+                    </div>
+                </div>
+
+                <!-- RECENT TRANSACTIONS -->
+                <div class="section-header">
+                    <h2>Recent History</h2>
+                    <span>View All</span>
+                </div>
+
+                <div class="transaction-list">
+                    <!-- Transaction 1 -->
+                    <div class="tx-item">
+                        <div class="tx-left">
+                            <div class="tx-icon in">↓</div>
+                            <div>
+                                <div class="tx-title">Wire Transfer In - SWIFT</div>
+                                <div class="tx-date">16 Nov 2026, 14:22</div>
+                            </div>
+                        </div>
+                        <div class="tx-right">
+                            <div class="tx-amount positive">+£2,500,000.00</div>
+                            <div class="tx-status">Completed</div>
+                        </div>
+                    </div>
+
+                    <!-- Transaction 2 -->
+                    <div class="tx-item">
+                        <div class="tx-left">
+                            <div class="tx-icon in">↓</div>
+                            <div>
+                                <div class="tx-title">Corporate Dividend Deposit</div>
+                                <div class="tx-date">12 Nov 2026, 09:15</div>
+                            </div>
+                        </div>
+                        <div class="tx-right">
+                            <div class="tx-amount positive">+£500,000.00</div>
+                            <div class="tx-status">Completed</div>
+                        </div>
+                    </div>
+
+                    <!-- Transaction 3 -->
+                    <div class="tx-item">
+                        <div class="tx-left">
+                            <div class="tx-icon out">↑</div>
+                            <div>
+                                <div class="tx-title">International Wire Transfer</div>
+                                <div class="tx-date">10 Nov 2026, 11:40</div>
+                            </div>
+                        </div>
+                        <div class="tx-right">
+                            <div class="tx-amount negative">-£45,000.00</div>
+                            <div class="tx-status">Blocked / Hold</div>
+                        </div>
+                    </div>
+
+                    <!-- Added History Items -->
+                    <div class="tx-item">
+                        <div class="tx-left">
+                            <div class="tx-icon in">↓</div>
+                            <div>
+                                <div class="tx-title">IRS Task Refund</div>
+                                <div class="tx-date">7 Nov 2026, 4:00</div>
+                            </div>
+                        </div>
+                        <div class="tx-right">
+                            <div class="tx-amount positive">+£2,800,000.00</div>
+                            <div class="tx-status">Deposited</div>
+                        </div>
+                    </div>
+                  
+                    <div class="tx-item">
+                        <div class="tx-left">
+                            <div class="tx-icon out">↑</div>
+                            <div>
+                                <div class="tx-title">Wire Transfer</div>
+                                <div class="tx-date">6 Nov 2026, 11:30</div>
+                            </div>
+                        </div>
+                        <div class="tx-right">
+                            <div class="tx-amount negative">-£5,000.00</div>
+                            <div class="tx-status">Blocked / Hold</div>
+                        </div>
+                    </div>
+                  
+                    <div class="tx-item">
+                        <div class="tx-left">
+                            <div class="tx-icon out">↑</div>
+                            <div>
+                                <div class="tx-title">House Rent Payment</div>
+                                <div class="tx-date">5 Nov 2026, 1:40</div>
+                            </div>
+                        </div>
+                        <div class="tx-right">
+                            <div class="tx-amount negative">-£45,000.00</div>
+                            <div class="tx-status">Blocked / Hold</div>
+                        </div>
+                    </div>
+                  
+                    <!-- Transaction 4 -->
+                    <div class="tx-item">
+                        <div class="tx-left">
+                            <div class="tx-icon out">↑</div>
+                            <div>
+                                <div class="tx-title">Private Wealth Advisory Fee</div>
+                                <div class="tx-date">02 Nov 2026, 16:00</div>
+                            </div>
+                        </div>
+                        <div class="tx-right">
+                            <div class="tx-amount negative">-£2,500.00</div>
+                            <div class="tx-status">Completed</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTTOM NAVIGATION -->
+            <div class="bottom-nav">
+                <button class="nav-item active" onclick="switchNav('home')">
+                    <span class="nav-icon">🏠</span>
+                    <span>Home</span>
+                </button>
+                <button class="nav-item" onclick="showNotAvailable('Payments feature')">
+                    <span class="nav-icon">⇄</span>
+                    <span>Payments</span>
+                </button>
+                <button class="nav-item" onclick="showNotAvailable('Investments feature')">
+                    <span class="nav-icon">📊</span>
+                    <span>Invest</span>
+                </button>
+                <button class="nav-item" onclick="openSupportModal()">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Support</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SUPPORT / CONTACT ACCOUNTANT MODAL -->
+    <div id="support-modal" class="modal-overlay" onclick="closeSupportModal(event)">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <div class="modal-icon">📞</div>
+            <div class="modal-title">Contact Accountant</div>
+            <div class="modal-desc">For verification and assistance with lifting your account hold, please reach out to your assigned accountant below:</div>
+            <div class="copy-box" id="accountant-email" onclick="copyEmail()">
+                cougarmommonic@gmail.com
+            </div>
+            <button class="modal-btn" onclick="closeSupportModalButton()">Close</button>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="toast">Email copied to clipboard!</div>
+
+    <script>
+        // Automatic flow simulation from Splash -> Login -> Dashboard
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                document.getElementById('splash-screen').classList.add('hidden');
+                document.getElementById('login-screen').classList.remove('hidden');
+            }, 2500); // 2.5 seconds splash display
+        });
+
+        function attemptLogin() {
+            const nameInput = document.getElementById('login-name').value.trim();
+            const numberInput = document.getElementById('login-number').value.trim();
+            const passwordInput = document.getElementById('login-password').value;
+            const errorDiv = document.getElementById('login-error');
+
+            // Required credentials check
+            const correctName = "Tina Bradley";
+            const correctNumber = "140892-8831";
+            const correctPassword = "Tina0909$";
+
+            if (nameInput === correctName && numberInput === correctNumber && passwordInput === correctPassword) {
+                errorDiv.style.display = 'none';
+                
+                // Set name dynamically
+                document.getElementById('display-name').innerText = correctName;
+                document.getElementById('card-holder-name').innerText = correctName;
+                document.getElementById('display-avatar').innerText = "TB";
+
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('dashboard-screen').classList.remove('hidden');
+            } else {
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function logout() {
+            // Clear input fields on logout
+            document.getElementById('login-name').value = '';
+            document.getElementById('login-number').value = '';
+            document.getElementById('login-password').value = '';
+            document.getElementById('login-error').style.display = 'none';
+
+            document.getElementById('dashboard-screen').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+        }
+
+        function openSupportModal() {
+            document.getElementById('support-modal').classList.add('active');
+        }
+
+        function closeSupportModal(e) {
+            if (e.target.id === 'support-modal') {
+                document.getElementById('support-modal').classList.remove('active');
+            }
+        }
+
+        function closeSupportModalButton() {
+            document.getElementById('support-modal').classList.remove('active');
+        }
+
+        function copyEmail() {
+            const emailText = document.getElementById('accountant-email').innerText;
+            navigator.clipboard.writeText(emailText).then(() => {
+                showToast();
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        function showNotAvailable(featureName) {
+            alert(featureName + " is currently not available due to active account hold status.");
+        }
+
+        function switchNav(tab) {
+            // Placeholder for navigation actions if needed
+        }
+    </script>
+</body>
+</html>
